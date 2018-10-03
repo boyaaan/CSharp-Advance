@@ -1,0 +1,74 @@
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Numerics;
+using System.Collections.Generic;
+
+class Program
+{
+    static List<string> seats = new List<string>();
+    static List<string> numbersOfSeats = new List<string>();
+    static Stack<string> numbersAndSeats = new Stack<string>();
+    static string location = string.Empty;
+
+    static void Main()
+    {
+        location = Console.ReadLine();
+
+        string input = Console.ReadLine();
+
+        var matches = Regex.Matches(input, @"\{[^\[{\]}\]]*\[([A-Z]{3} [A-Z]{2})\][^\[{\]}\]]*\[([A-Z](\d\d?))\][^\[{\]}\]]*\}|\[[^\[{\]}\]]*\{([A-Z]{3} [A-Z]{2})\}[^\[{\]}\]]*\{([A-Z](\d\d?))\}[^\[{\]}\]]*\]");
+        var equalNum = -1;
+
+        foreach (Match match in matches)
+        {
+            var curMatch = match.Groups[0].Value.ToString();
+
+            if (curMatch.StartsWith("{"))
+            {
+                equalNum = MatchPrinting(match, 1, 2, 3);
+            }
+            else
+            {
+                equalNum = MatchPrinting(match, 1 + 3, 2 + 3, 3 + 3);
+            }
+
+            if (equalNum != -1)
+            {
+                Console.WriteLine($"You are traveling to {location} on seats {seats[equalNum]} and {seats[seats.Count -1]}.");
+                break;
+            }
+        }
+
+        if (equalNum == -1)
+        {
+            var second = numbersAndSeats.Pop();
+            var first = numbersAndSeats.Pop();
+
+            Console.WriteLine($"You are traveling to {location} on seats {first} and {second}.");
+        }
+    }
+
+    public static int MatchPrinting(Match match, int matchIndex1, int matchIndex2, int matchIndex3)
+    {
+        var curlocation = match.Groups[matchIndex1].Value;
+        var seatNumber = match.Groups[matchIndex2].Value;
+        var number = match.Groups[matchIndex3].Value;
+        var iqualNum = -1;
+
+        if (curlocation == location)
+        {
+            if (numbersOfSeats.Contains(number))
+            {
+                iqualNum = numbersOfSeats.IndexOf(number);
+            }
+
+            numbersOfSeats.Add(number);
+            seats.Add(seatNumber);
+            numbersAndSeats.Push(seatNumber);
+        }
+        return iqualNum;
+    }
+}
+
