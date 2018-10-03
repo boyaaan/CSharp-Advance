@@ -1,0 +1,237 @@
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Numerics;
+using System.Collections.Generic;
+using System.Globalization;
+
+class Program
+{
+    static List<List<string>> matrix = new List<List<string>>();
+    static Queue<char> queueCommand = new Queue<char>();
+    static bool isFinish = false;
+    static int indexN = 0;
+
+    static void Main()
+    {
+        int n = int.Parse(Console.ReadLine());
+
+        FillingMatrix(n);
+
+        string commands = Console.ReadLine();
+
+        foreach (var item in commands)
+        {
+            queueCommand.Enqueue(item);
+        }
+
+        while (queueCommand.Count > 0)
+        {
+            if (isFinish)
+            {
+                break;
+            }
+
+            MoveEnemy();
+
+            if (isFinish)
+            {
+                break;
+            }
+
+            MoveSam();
+        }
+    }
+
+    public static void MoveSam()
+    {
+
+        for (int row = 0; row < matrix.Count; row++)
+        {
+            int indexS = matrix[row].IndexOf("S");
+
+            if (indexS >= matrix[row].Count || indexS <= 0)
+            {
+                continue;
+            }
+
+            if (indexS != -1)
+            {
+                char command = queueCommand.Dequeue();
+
+
+                switch (command)
+                {
+                    case 'U':
+                        matrix[row][indexS] = ".";
+                        matrix[row - 1][indexS] = "S";
+
+                        if (matrix[row - 1].Contains("N"))
+                        {
+                            matrix[row - 1][indexN] = "X";
+                            Nikodim();
+                        }
+
+                        break;
+                    case 'D':
+                        matrix[row][indexS] = ".";
+                        matrix[row + 1][indexS] = "S";
+
+                        if (matrix[row + 1].Contains("N"))
+                        {
+                            matrix[row + 1][indexN] = "X";
+                            Nikodim();
+                        }
+
+                        break;
+                    case 'L':
+                        matrix[row][indexS] = ".";
+                        matrix[row][indexS - 1] = "S";
+
+                        if (matrix[row].Contains("N"))
+                        {
+                            matrix[row][indexN] = "X";
+                            Nikodim();
+                        }
+
+                        break;
+                    case 'R':
+                        matrix[row][indexS] = ".";
+                        matrix[row][indexS + 1] = "S";
+
+                        if (matrix[row].Contains("N"))
+                        {
+                            matrix[row][indexN] = "X";
+                            Nikodim();
+                        }
+
+                        break;
+                    case 'W':
+                        break;
+                }
+
+                if (isFinish)
+                {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+
+    public static void Nikodim()
+    {
+        Console.WriteLine("Nikoladze killed!");
+        WriteMatrix();
+    }
+
+    public static void MoveEnemy()
+    {
+        for (int row = 0; row < matrix.Count; row++)
+        {
+            int indexB = matrix[row].IndexOf("b");
+            int indexD = matrix[row].IndexOf("d");
+
+            if (indexB != -1)
+            {
+
+                if (indexB == matrix[row].Count - 1)
+                {
+                    matrix[row][indexB] = "d";
+
+                    if (matrix[row].Contains("S"))
+                    {
+                        int indexS = matrix[row].IndexOf("S");
+
+                        Console.WriteLine($"Sam died at {row}, {indexS}");
+                        matrix[row][indexS] = "X";
+                        WriteMatrix();
+                    }
+                }
+                else
+                {
+                    matrix[row][indexB] = ".";
+                    matrix[row][indexB + 1] = "b";
+                }
+
+                if (matrix[row].Contains("S") && indexB != matrix[row].Count - 1)
+                {
+                    int indexS = matrix[row].IndexOf("S");
+
+                    if (indexB < indexS)
+                    {
+                        Console.WriteLine($"Sam died at {row}, {indexS}");
+                        matrix[row][indexS] = "X";
+                        WriteMatrix();
+                       
+                    }
+                }
+
+            }
+            else if (indexD != -1)
+            {
+                if (indexD == 0)
+                {
+                    matrix[row][indexD] = "b";
+
+                    if (matrix[row].Contains("S"))
+                    {
+                        int indexS = matrix[row].IndexOf("S");
+
+                        Console.WriteLine($"Sam died at {row}, {indexS}");
+                        matrix[row][indexS] = "X";
+                        WriteMatrix();
+                    }
+                }
+                else
+                {
+                    matrix[row][indexD] = ".";
+                    matrix[row][indexD - 1] = "d";
+                }
+
+                if (matrix[row].Contains("S") && indexB != 0)
+                {
+                    int indexS = matrix[row].IndexOf("S");
+
+                    if (indexD > indexS)
+                    {
+                        Console.WriteLine($"Sam died at {row}, {indexS}");
+                        matrix[row][indexS] = "X";
+                        WriteMatrix();
+
+                    }
+                }
+            }
+        }
+    }
+
+    public static void WriteMatrix()
+    {
+        for (int row = 0; row < matrix.Count; row++)
+        {
+            Console.WriteLine(string.Join("", matrix[row]));
+        }
+        isFinish = true;
+        return;
+    }
+
+    public static void FillingMatrix(int n)
+    {
+        for (int row = 0; row < n; row++)
+        {
+            matrix.Add(new List<string>());
+            string sequennces = Console.ReadLine();
+
+            foreach (var item in sequennces)
+            {
+                matrix[row].Add(item.ToString());
+            }
+
+            if (matrix[row].Contains("N"))
+            {
+                indexN = matrix[row].IndexOf("N");
+            }
+        }
+    }
+}
