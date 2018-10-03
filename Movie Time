@@ -1,0 +1,73 @@
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Numerics;
+using System.Collections.Generic;
+using System.Globalization;
+
+class Program
+{
+    private static DateTimeStyles cultureInfo;
+
+    static void Main()
+    {
+        string genre = Console.ReadLine();
+        string shortOrlong = Console.ReadLine();
+
+        var favoriteMovise = new Dictionary<string, DateTime>();
+        var totalDuration = new DateTime();
+
+        string input = string.Empty;
+        while ((input = Console.ReadLine()) != "POPCORN!")
+        {
+            var curInput = input.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+            var nameMoves = curInput[0];
+            var curGenre = curInput[1];
+            var duration = DateTime.Parse(curInput[2]);
+            totalDuration += duration.TimeOfDay;
+
+            if (curGenre != genre)
+            {
+                continue;
+            }
+
+            if (!favoriteMovise.ContainsKey(nameMoves))
+            {
+                favoriteMovise[nameMoves] = new DateTime();
+            }
+            favoriteMovise[nameMoves] = duration;
+
+        }
+
+        if (shortOrlong == "Short")
+        {
+            favoriteMovise = favoriteMovise
+                .OrderBy(x => x.Value)
+                .ThenBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Value);
+        }
+        else
+        {
+            favoriteMovise = favoriteMovise
+                .OrderByDescending(x => x.Value)
+                .ThenBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        foreach (var movies in favoriteMovise)
+        {
+            string reachYes = Console.ReadLine();
+            Console.WriteLine($"{movies.Key}");
+
+            if (reachYes == "Yes")
+            {
+                Console.WriteLine($"We're watching {movies.Key} - {movies.Value.ToString("HH:mm:ss")}");
+                break;
+            }
+        }
+        Console.WriteLine($"Total Playlist Duration: {totalDuration.ToString("HH:mm:ss")}");
+    }
+}
+
