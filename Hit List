@@ -1,0 +1,70 @@
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Numerics;
+using System.Collections.Generic;
+using System.Globalization;
+
+class Program
+{
+    static void Main()
+    {
+        int target = int.Parse(Console.ReadLine());
+        var hitList = new Dictionary<string, Dictionary<string, string>>();
+        int infoIndex = 0;
+
+        string input = string.Empty;
+        while ((input = Console.ReadLine()) != "end transmissions")
+        {
+            var curinput = input
+                .Split("=".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+                .ToArray();
+            var name = curinput[0];
+            var keyValues = curinput[1].Split(';').ToList();
+
+            if (!hitList.ContainsKey(name))
+            {
+                hitList[name] = new Dictionary<string, string>();
+            }
+
+            foreach (var item in keyValues)
+            {
+                var curItem = item.Split(':');
+
+                if (!hitList[name].ContainsKey(curItem[0]))
+                {
+                    hitList[name][curItem[0]] = string.Empty;
+                }
+
+                hitList[name][curItem[0]] = curItem[1];
+            }
+
+        }
+
+        var killName = Console.ReadLine()
+            .Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
+            .ToArray();
+
+        string curkillName = killName[1];
+
+        Console.WriteLine($"Info on {curkillName}:");
+
+        foreach (var item in hitList[curkillName].OrderBy(x => x.Key))
+        {
+            infoIndex += item.Key.Length + item.Value.Length;
+            Console.WriteLine($"---{item.Key}: {item.Value}");
+        }
+
+        Console.WriteLine($"Info index: {infoIndex}");
+
+        if (infoIndex >= target)
+        {
+            Console.WriteLine("Proceed");
+        }
+        else
+        {
+            Console.WriteLine($"Need {Math.Abs(target - infoIndex)} more info.");
+        }
+    }
+}
