@@ -39,7 +39,6 @@ class Program
 
                 hitList[name][curItem[0]] = curItem[1];
             }
-
         }
 
         var killName = Console.ReadLine()
